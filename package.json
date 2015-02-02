@@ -1,15 +1,17 @@
 {
   "name": "never-ending-stream",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Automatically restarts your stream for you when it ends",
   "main": "never-ending-stream.js",
   "scripts": {
-    "test": "tape test.js | faucet"
+    "test": "tape test.js | faucet",
+    "style": "standard"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/mcollina/never-ending-stream.git"
   },
+  "pre-commit": ["style", "test"],
   "keywords": [
     "stream",
     "restart",
@@ -25,7 +27,7 @@
   "homepage": "https://github.com/mcollina/never-ending-stream",
   "devDependencies": {
     "faucet": "0.0.1",
-    "pre-commit": "^1.0.2",
+    "pre-commit": "^0.0.9",
     "standard": "^2.3.1",
     "from2": "^1.3.0",
     "tape": "^3.5.0"

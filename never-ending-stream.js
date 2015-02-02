@@ -1,8 +1,7 @@
-
 var through = require('through2')
-  , eos     = require('end-of-stream')
+var eos = require('end-of-stream')
 
-function neverEndingStream(build, opts) {
+function neverEndingStream (build, opts) {
   var result = through.obj({ highWatermark: 1 })
   var stream = null
   var stopped = false
@@ -13,13 +12,13 @@ function neverEndingStream(build, opts) {
     stopped = true
     stream.destroy()
     oldDestroy.call(this)
-  };
+  }
 
   restart()
 
   return result
 
-  function restart() {
+  function restart () {
     if (stopped) {
       return
     }

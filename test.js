@@ -1,19 +1,18 @@
-
-var test    = require('tape')
-  , through = require('through2')
-  , from    = require('from2')
-  , nes     = require('./')
+var test = require('tape')
+var through = require('through2')
+var from = require('from2')
+var nes   = require('./')
 
 test('starts the stream', function(t) {
   var chunks = [new Buffer('hello'), new Buffer('world')]
-    , stream = nes(function() {
+  var stream = nes(function() {
         var source = [].concat(chunks)
         var orig = from(function(size, next) {
           next(null, source.shift())
         })
         return orig
       })
-    , expected = [].concat(chunks)
+  var expected = [].concat(chunks)
 
   t.plan(chunks.length)
 
@@ -27,7 +26,7 @@ test('starts the stream', function(t) {
   }))
 })
 
-function restartTest(name, chunks) {
+function restartTest (name, chunks) {
   test('restarts the stream ' + name, function(t) {
     var stream = nes(function() {
           var source = [].concat(chunks)
@@ -36,7 +35,7 @@ function restartTest(name, chunks) {
           })
           return orig
         })
-      , expected = [].concat(chunks).concat(chunks)
+    var expected = [].concat(chunks).concat(chunks)
 
     t.plan(expected.length)
 
