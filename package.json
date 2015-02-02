@@ -1,0 +1,37 @@
+{
+  "name": "never-ending-stream",
+  "version": "0.0.1",
+  "description": "Automatically restarts your stream for you when it ends",
+  "main": "never-ending-stream.js",
+  "scripts": {
+    "test": "tape test.js | faucet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcollina/never-ending-stream.git"
+  },
+  "keywords": [
+    "stream",
+    "restart",
+    "never",
+    "ends",
+    "autorestart"
+  ],
+  "author": "Matteo Collina <hello@matteocollina.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mcollina/never-ending-stream/issues"
+  },
+  "homepage": "https://github.com/mcollina/never-ending-stream",
+  "devDependencies": {
+    "faucet": "0.0.1",
+    "pre-commit": "^1.0.2",
+    "standard": "^2.3.1",
+    "from2": "^1.3.0",
+    "tape": "^3.5.0"
+  },
+  "dependencies": {
+    "end-of-stream": "^1.1.0",
+    "through2": "^0.6.3"
+  }
+}
