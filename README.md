@@ -9,11 +9,12 @@ var nes       = require('never-ending-stream')
   , through   = require('through2')
   , assert    = require('assert')
   , chunks    = [new Buffer('hello'), new Buffer('world')]
-  , stream    = nes(function() {
+  , stream    = nes(function(cb) {
       var source = [].concat(chunks)
       var orig = from.obj(function(size, next) {
         next(null, source.shift())
       })
+      // or cb(null, orig)
       return orig
     })
   , expected  = [].concat(chunks).concat(chunks)

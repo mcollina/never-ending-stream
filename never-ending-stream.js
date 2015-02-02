@@ -1,10 +1,11 @@
 var through = require('through2')
 var eos = require('end-of-stream')
 
-function neverEndingStream (build, opts) {
+function neverEndingStream (build) {
   var result = through.obj({ highWatermark: 1 })
   var stream = null
   var stopped = false
+  var piped
 
   var oldDestroy = result.destroy
 
@@ -23,9 +24,18 @@ function neverEndingStream (build, opts) {
       return
     }
 
-    stream = build(opts)
-    stream.pipe(result, { end: false })
-    eos(stream, restart)
+    piped = false
+    next(null, build(next))
+  }
+
+  function next(err, s) {
+    if (err) return result.emit('error', err)
+    if (piped || !s) return
+
+    piped = true
+    s.pipe(result, { end: false })
+    eos(s, restart)
+    stream = s
   }
 }
 
