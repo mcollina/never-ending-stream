@@ -73,3 +73,13 @@ function restartTest (name, chunks) {
 
 restartTest('with buffers', [new Buffer('hello'), new Buffer('world')])
 restartTest('with objects', [{ hello: 'world' }, { my: 'name' }])
+
+test('destroy if the stream is null', function(t) {
+  var stream = nes(function() {
+        return null
+      })
+
+  stream.destroy()
+
+  t.end()
+})

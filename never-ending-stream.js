@@ -11,7 +11,9 @@ function neverEndingStream (build) {
 
   result.destroy = function() {
     stopped = true
-    stream.destroy()
+    if (stream) {
+      stream.destroy()
+    }
     oldDestroy.call(this)
   }
 
@@ -29,6 +31,7 @@ function neverEndingStream (build) {
   }
 
   function next(err, s) {
+    stream = s
     if (err) return result.emit('error', err)
     if (piped || !s) return
 
