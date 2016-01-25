@@ -1,6 +1,6 @@
 {
   "name": "never-ending-stream",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "description": "concatenate multiple streams",
   "main": "never-ending-stream.js",
   "scripts": {
