@@ -21,7 +21,7 @@ test('starts the stream', function(t) {
       return stream.destroy()
     }
 
-    t.equal(expected.shift(), chunk, 'chunk should be the same')
+    t.deepEqual(expected.shift(), chunk, 'chunk should be the same')
     cb()
   }))
 })
@@ -74,12 +74,32 @@ function restartTest (name, chunks) {
 restartTest('with buffers', [new Buffer('hello'), new Buffer('world')])
 restartTest('with objects', [{ hello: 'world' }, { my: 'name' }])
 
-test('destroy if the stream is null', function(t) {
+test('emits end if the stream is null', function(t) {
+  t.plan(1)
+
   var stream = nes(function() {
-        return null
-      })
+    return null
+  })
 
+  stream.on('end', t.pass.bind(t))
+
+  stream.resume()
+})
+
+test('destroy', function(t) {
+  t.plan(1)
+
+  var chunks = [new Buffer('hello'), new Buffer('world')]
+  var stream = nes(function() {
+    var source = [].concat(chunks)
+    var orig = from(function(size, next) {
+      next(null, source.shift())
+    })
+    return orig
+  })
+
+  stream.on('end', t.pass.bind(t))
+
+  stream.resume()
   stream.destroy()
-
-  t.end()
 })
