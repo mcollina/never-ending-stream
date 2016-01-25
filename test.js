@@ -46,9 +46,9 @@ test('starts the stream', function (t) {
   }))
 })
 
-function restartTest (name, chunks) {
+function restartTest (name, chunks, toNes) {
   test('restarts the stream ' + name, function (t) {
-    var stream = nes(buildFrom(2, chunks))
+    var stream = toNes(buildFrom(2, chunks))
     var expected = [].concat(chunks).concat(chunks)
 
     t.plan(expected.length)
@@ -65,7 +65,7 @@ function restartTest (name, chunks) {
   })
 
   test('restarts asynchronously the stream ' + name, function (t) {
-    var stream = nes(buildFrom(2, chunks, true))
+    var stream = toNes(buildFrom(2, chunks, true))
     var expected = [].concat(chunks).concat(chunks)
 
     t.plan(expected.length)
@@ -81,8 +81,8 @@ function restartTest (name, chunks) {
   })
 }
 
-restartTest('with buffers', [new Buffer('hello'), new Buffer('world')])
-restartTest('with objects', [{ hello: 'world' }, { my: 'name' }])
+restartTest('with buffers', [new Buffer('hello'), new Buffer('world')], nes)
+restartTest('with objects', [{ hello: 'world' }, { my: 'name' }], nes.obj)
 
 test('emits end if the stream is null', function (t) {
   t.plan(1)

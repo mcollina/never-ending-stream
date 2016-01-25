@@ -1,12 +1,25 @@
 var through = require('through2')
 var eos = require('end-of-stream')
 
-function neverEndingStream (build) {
-  var result = through.obj()
+function neverEndingStream (opts, build) {
+  if (typeof opts === 'function') {
+    build = opts
+    opts = null
+  }
+
+  opts = opts || {}
+
+  var result
   var stream = null
   var stopped = false
-  var oldDestroy = result.destroy
 
+  if (opts.objectMode) {
+    result = through.obj(opts)
+  } else {
+    result = through(opts)
+  }
+
+  var oldDestroy = result.destroy
   result.destroy = function () {
     stopped = true
     if (stream && stream.destroy) {
@@ -44,6 +57,18 @@ function neverEndingStream (build) {
       eos(s, restart)
     }
   }
+}
+
+neverEndingStream.obj = function (opts, build) {
+  if (typeof opts === 'function') {
+    build = opts
+    opts = null
+  }
+
+  opts = opts || {}
+  opts.objectMode = true
+
+  return neverEndingStream(opts, build)
 }
 
 module.exports = neverEndingStream
