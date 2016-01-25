@@ -1,69 +1,79 @@
 var test = require('tape')
 var through = require('through2')
 var from = require('from2')
-var nes   = require('./')
+var nes = require('./')
 
-test('starts the stream', function(t) {
-  var chunks = [new Buffer('hello'), new Buffer('world')]
-  var stream = nes(function() {
-        var source = [].concat(chunks)
-        var orig = from(function(size, next) {
-          next(null, source.shift())
+function buildFrom (count, chunks, async) {
+  return function () {
+    if (count-- === 0) {
+      return null
+    }
+
+    var source = [].concat(chunks)
+    source.push(null)
+
+    var opts = {}
+
+    opts.objectMode = !Buffer.isBuffer(chunks[0])
+
+    return from(opts, function (size, next) {
+      var chunk = source.shift()
+      if (async) {
+        setImmediate(function () {
+          next(null, chunk)
         })
-        return orig
-      })
-  var expected = [].concat(chunks)
+      } else {
+        next(null, chunk)
+      }
+    })
+  }
+}
 
-  t.plan(chunks.length)
+test('starts the stream', function (t) {
+  var expected = [new Buffer('hello'), new Buffer('world')]
+  t.plan(expected.length)
 
-  stream.pipe(through(function(chunk, enc, cb) {
+  var stream = nes(buildFrom(1, [].concat(expected)))
+
+  stream.pipe(through(function (chunk, enc, cb) {
+    t.deepEqual(chunk, expected.shift(), 'chunk should be the same')
+
     if (expected.length === 0) {
       return stream.destroy()
     }
 
-    t.deepEqual(expected.shift(), chunk, 'chunk should be the same')
     cb()
   }))
 })
 
 function restartTest (name, chunks) {
-  test('restarts the stream ' + name, function(t) {
-    var stream = nes(function() {
-          var source = [].concat(chunks)
-          var orig = from.obj(function(size, next) {
-            next(null, source.shift())
-          })
-          return orig
-        })
+  test('restarts the stream ' + name, function (t) {
+    var stream = nes(buildFrom(2, chunks))
     var expected = [].concat(chunks).concat(chunks)
 
     t.plan(expected.length)
 
-    stream.pipe(through.obj(function(chunk, enc, cb) {
-      if (expected.length === 0)
-        return stream.destroy()
+    stream.pipe(through.obj(function (chunk, enc, cb) {
+      t.deepEqual(chunk, expected.shift(), 'chunk should be the same')
 
-      t.equal(expected.shift(), chunk, 'chunk should be the same')
+      if (expected.length === 0) {
+        return stream.destroy()
+      }
+
       cb()
     }))
   })
 
-  test('restarts asynchronously the stream ' + name, function(t) {
-    var stream = nes(function(cb) {
-          var source = [].concat(chunks)
-          var orig = from.obj(function(size, next) {
-            next(null, source.shift())
-          })
-
-          cb(null, orig)
-        })
+  test('restarts asynchronously the stream ' + name, function (t) {
+    var stream = nes(buildFrom(2, chunks, true))
     var expected = [].concat(chunks).concat(chunks)
 
     t.plan(expected.length)
 
-    stream.pipe(through.obj(function(chunk, enc, cb) {
-      if (expected.length === 0)
+    stream.pipe(through.obj(function (chunk, enc, cb) {
+      if (expected.length === 0) {
         return stream.destroy()
+      }
 
       t.equal(expected.shift(), chunk, 'chunk should be the same')
       cb()
@@ -74,10 +84,10 @@ function restartTest (name, chunks) {
 restartTest('with buffers', [new Buffer('hello'), new Buffer('world')])
 restartTest('with objects', [{ hello: 'world' }, { my: 'name' }])
 
-test('emits end if the stream is null', function(t) {
+test('emits end if the stream is null', function (t) {
   t.plan(1)
 
-  var stream = nes(function() {
+  var stream = nes(function () {
     return null
   })
 
@@ -86,17 +96,11 @@ test('emits end if the stream is null', function(t) {
   stream.resume()
 })
 
-test('destroy', function(t) {
+test('destroy', function (t) {
   t.plan(1)
 
   var chunks = [new Buffer('hello'), new Buffer('world')]
-  var stream = nes(function() {
-    var source = [].concat(chunks)
-    var orig = from(function(size, next) {
-      next(null, source.shift())
-    })
-    return orig
-  })
+  var stream = nes(buildFrom(1, chunks))
 
   stream.on('end', t.pass.bind(t))
 

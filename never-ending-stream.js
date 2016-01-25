@@ -5,11 +5,9 @@ function neverEndingStream (build) {
   var result = through.obj()
   var stream = null
   var stopped = false
-  var piped
-
   var oldDestroy = result.destroy
 
-  result.destroy = function() {
+  result.destroy = function () {
     stopped = true
     if (stream && stream.destroy) {
       stream.destroy()
@@ -33,9 +31,11 @@ function neverEndingStream (build) {
     }
   }
 
-  function next(err, s) {
+  function next (err, s) {
     stream = s
-    if (err) return result.emit('error', err)
+    if (err) {
+      return result.emit('error', err)
+    }
 
     if (!stream) {
       result.end()
