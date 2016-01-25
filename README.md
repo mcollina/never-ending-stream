@@ -1,31 +1,40 @@
 # never-ending-stream
 
-Automatically restarts your stream for you when it ends
+Automatically restarts your stream for you when it ends.
+This can be easily use to concatenate multiple streams.
 
 ## Usage
 
 ```js
+'use strict'
+
 var nes = require('never-ending-stream')
 var from = require('from2')
-var through = require('through2')
-var assert = require('assert')
 var chunks = [new Buffer('hello'), new Buffer('world')]
 var count = 0
-var stream = nes(function(cb) {
+
+var stream = nes(function () {
+  if (count++ === 2) {
+    // close the stream after 2 runs
+    return null
+  }
+
   var source = [].concat(chunks)
-  var orig = from.obj(function(size, next) {
-    next(null, source.shift())
+
+  return from.obj(function (size, next) {
+    var chunk = source.shift() || null
+    next(null, chunk)
   })
-  return orig
 })
-var expected  = [].concat(chunks).concat(chunks)
 
-stream.pipe(through.obj(function (chunk, enc, cb) {
-  if (expected.length === 0)
-    return stream.destroy() // stops the stream!
-
-  cb()
-}))
+// prints
+//  hello
+//  world
+//  hello
+//  world
+stream.on('data', function (data) {
+  console.log(data.toString())
+})
 ```
 
 ## API

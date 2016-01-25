@@ -1,7 +1,7 @@
 {
   "name": "never-ending-stream",
   "version": "1.1.2",
-  "description": "Automatically restarts your stream for you when it ends",
+  "description": "concatenate multiple streams",
   "main": "never-ending-stream.js",
   "scripts": {
     "test": "tape test.js | faucet",
@@ -17,7 +17,8 @@
     "restart",
     "never",
     "ends",
-    "autorestart"
+    "autorestart",
+    "concat"
   ],
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
