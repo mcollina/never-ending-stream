@@ -9,17 +9,11 @@ function neverEndingStream (opts, build) {
 
   opts = opts || {}
 
-  var result
+  var result = through(opts)
   var stream = null
   var stopped = false
-
-  if (opts.objectMode) {
-    result = through.obj(opts)
-  } else {
-    result = through(opts)
-  }
-
   var oldDestroy = result.destroy
+
   result.destroy = function () {
     stopped = true
     if (stream && stream.destroy) {
